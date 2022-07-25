@@ -1,0 +1,19 @@
+apiVersion: 1
+
+datasources:
+- id: 1
+  uid: eNy3VsC7k
+  orgId: 1
+  name: PrometheusMonk
+  type: prometheus
+  typeName: Prometheus
+  typeLogoUrl: public/app/plugins/datasource/prometheus/img/prometheus_logo.svg
+  access: proxy
+  url: http://{{ v "prometheusHost" }}:9090
+  user: ''
+  database: ''
+  basicAuth: false
+  isDefault: false
+  jsonData:
+    httpMethod: POST
+  readOnly: false

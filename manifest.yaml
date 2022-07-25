@@ -1,0 +1,120 @@
+namespace: monitoring
+
+node-exporter:
+  defines: runnable
+
+  containers:
+    node:
+      image: quay.io/prometheus/node-exporter
+      image-tag: latest
+      paths:
+        - '/:/host:ro,rslave'
+      bash: <- `/bin/node_exporter ${cmdParams}`
+      ports:
+        - 9100:9100
+
+  variables:
+    cmdParams:
+      type: string
+      value: --path.rootfs=/host
+
+prometheus:
+  defines: runnable
+
+  containers:
+    prom:
+      image: prom/prometheus
+      image-tag: latest
+      ports:
+        - 9090:9090
+      bash: <- `/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/console ${cmdParams}`
+
+  variables:
+    cmdParams:
+      type: string
+      value:
+
+    targets:
+      type: string
+      value: <- "\"" get-hostname("monitoring/node-exporter", "node") ":9100\"" concat-all
+
+    additional_targets:
+      type: string
+      value: 
+
+  files:
+    config:
+      container: prom
+      mode: 0644
+      path: /etc/prometheus/prometheus.yml
+      contents: <<< files/prometheus.yaml
+
+grafana:
+  defines: runnable
+
+  containers:
+    grafana:
+      environment:
+      - GF_AUTH_ANONYMOUS_HIDE_VERSION=true
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/dashboards/home_of_all_dashboards.json
+      - <- `GF_AUTH_ANONYMOUS_ORG_ROLE=${anonymous_role}`
+      - <- `GF_AUTH_ANONYMOUS_ENABLED=${anonymous}`
+      - <- `GF_SECURITY_ADMIN_USER=${admin-user}`
+      - <- `GF_SECURITY_ADMIN_PASSWORD=${admin-password}`
+      - <- `GF_INSTALL_PLUGINS=${install_plugins}`
+      image: docker.io/grafana/grafana
+      ports:
+      - 3000:3000
+      image-tag: latest
+
+  files:
+    datasource:
+      container: grafana
+      mode: 0644
+      path: /etc/grafana/provisioning/datasources/datasources.yaml
+      contents: <<< files/datasources.yaml
+    
+    dashboard:
+      container: grafana
+      mode: 0644
+      path: /etc/grafana/provisioning/dashboards/dashboards.yaml
+      contents: <<< files/dashboards.yaml
+    
+    dashboard_diskfree:
+      container: grafana
+      mode: 0644
+      path: /etc/grafana/dashboards/diskfree.json
+      contents: <<< files/diskfree.json
+
+    dashboard_home:
+      container: grafana
+      mode: 0644
+      path: /etc/grafana/dashboards/home_of_all_dashboards.json
+      contents: <<< files/home_of_all_dashboards.json
+
+  variables:
+    prometheusHost:
+      type: string
+      value: <- get-hostname("monitoring/prometheus", "prom")
+    admin-user:
+      value: admin
+      type: string
+    admin-password:
+      type: string
+      value: adminz
+    install_plugins:
+      type: string
+      value: grafana-clock-panel,grafana-simple-json-datasource
+    anonymous:
+      type: string
+      value: true
+    anonymous_role:
+      type: string
+      value: Viewer
+
+stack:
+  defines: process-group
+  runnable-list:
+    - monitoring/grafana
+    - monitoring/node-exporter
+    - monitoring/prometheus

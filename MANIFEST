@@ -1,0 +1,3 @@
+REPO monk-prometheus-grafana
+LOAD manifest.yaml
+RESOURCES files/dashboards.yaml files/datasources.yaml files/diskfree.json files/home_of_all_dashboards.json files/prometheus.yaml
