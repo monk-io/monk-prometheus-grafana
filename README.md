@@ -107,14 +107,14 @@ You can quickly setup by editing the values there.
 
 ### Grafana
 
-| Variable        | Description                               | Default                                             |
-| --------------- | ----------------------------------------- | --------------------------------------------------- |
-| admin-user      | Administrator username                    | admin                                               |
-| admin-password  | Administrator password                    | adminz                                              |
-| install_plugins | Default plugins to install with grafana   | grafana-clock-panel,grafana-simple-json-datasource  |
-| anonymous       | Should we enable anonymous access         | false                                               |
-| anonymous_role  | Role of the anonymous user                | Viewer                                              |
-| prometheusHost  | Dynamic var to point to a Prometheus host | `<- get-hostname("monitoring/prometheus", "prom")`* |
+| Variable        | Description                               | Default                                            |
+| --------------- | ----------------------------------------- | -------------------------------------------------- |
+| admin-user      | Administrator username                    | admin                                              |
+| admin-password  | Administrator password                    | admin                                              |
+| install_plugins | Default plugins to install with grafana   | grafana-clock-panel,grafana-simple-json-datasource |
+| anonymous       | Should we enable anonymous access         | false                                              |
+| anonymous_role  | Role of the anonymous user                | Viewer                                             |
+| prometheusHost  | Dynamic var to point to a Prometheus host | `<- connection-hostname("prometheus")`             |
 
 * Only needs to be updated if using in your own namespace
 

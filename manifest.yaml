@@ -3,6 +3,27 @@ namespace: monitoring
 node-exporter:
   defines: runnable
 
+  metadata:
+    website: https://prometheus.io
+    name: Node exporter
+    icon: https://prometheus.io/assets/prometheus_logo_grey.svg
+    publisher: monk.io
+    description: |
+      Node Exporter is a Prometheus exporter that collects and exports various metrics from the system-level resources of a host, such as CPU, memory, disk, and network usage. It is a lightweight tool that runs on the target host and exposes system-level metrics in a format that can be scraped by Prometheus, a popular monitoring and alerting system.
+
+      Node Exporter collects a wide range of metrics related to system resources and provides them in a standardized format, allowing users to easily monitor and analyze the performance of their hosts. It supports a variety of operating systems and architectures, making it compatible with a wide range of systems.
+
+      Node Exporter can be configured to collect and export additional custom metrics, and it provides various plugins and integrations with other monitoring and alerting tools. It also has a simple and easy-to-use interface, making it accessible to users of all skill levels. Overall, Node Exporter is a powerful and versatile tool that plays a critical role in monitoring the health and performance of hosts in a distributed system.
+    source: https://github.com/prometheus/node_exporter
+    tags: node exporter, monitoring, exporter, prometheus
+
+  services:
+    exporter:
+      container: node
+      port: 9100
+      protocol: tcp
+      # host-port: 9100
+
   containers:
     node:
       image: quay.io/prometheus/node-exporter
@@ -10,8 +31,8 @@ node-exporter:
       paths:
         - '/:/host:ro,rslave'
       bash: <- `/bin/node_exporter ${cmdParams}`
-      ports:
-        - 9100:9100
+      # ports:
+      #   - 9100:9100
 
   variables:
     cmdParams:
@@ -21,12 +42,40 @@ node-exporter:
 prometheus:
   defines: runnable
 
+  metadata:
+    website: https://prometheus.io
+    name: Prometheus
+    icon: https://prometheus.io/assets/prometheus_logo_grey.svg
+    publisher: monk.io
+    description: |
+      Prometheus is an open-source monitoring and alerting system that collects and stores time-series data, such as metrics and events, from various sources. It is designed to monitor and analyze the health and performance of distributed systems, including microservices and containerized environments.
+
+      Prometheus uses a pull-based model to collect data from various sources, including Node Exporter, Kubernetes, and other services. It stores the data in a time-series database, where it can be queried and analyzed using a powerful query language called PromQL.
+
+      Prometheus provides various features that help users monitor and analyze the performance of their systems, including visualization tools, alerting rules, and integrations with other monitoring and alerting tools. It also supports horizontal scaling and can be deployed in a highly available configuration.
+
+      Prometheus is highly configurable and customizable, making it suitable for a wide range of use cases. Its ease of use and flexibility have made it a popular choice among developers and DevOps teams looking to monitor and manage their systems effectively.
+    source: https://github.com/prometheus/node_exporter
+    tags: monitoring, exporter, prometheus
+
+  services:
+    prometheus:
+      container: prom
+      port: 9090
+      protocol: tcp
+      # host-port: 9090
+
+  connections:
+    node:
+      runnable: monitoring/node-exporter
+      service: exporter
+
   containers:
     prom:
       image: prom/prometheus
       image-tag: latest
-      ports:
-        - 9090:9090
+      # ports:
+      #   - 9090:9090
       bash: <- `/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/console ${cmdParams}`
 
   variables:
@@ -36,11 +85,11 @@ prometheus:
 
     targets:
       type: string
-      value: <- "\"" get-hostname("monitoring/node-exporter", "node") ":9100\"" concat-all
+      value: <- "\"" connection-hostname("node") ":" connection-port("node") "\"" concat-all
 
     additional_targets:
       type: string
-      value: 
+      value:
 
   files:
     config:
@@ -51,6 +100,34 @@ prometheus:
 
 grafana:
   defines: runnable
+
+  metadata:
+    website: https://grafana.com
+    name: Grafana
+    icon: https://grafana.com/static/assets/internal/grafana_logo-web-white-text.svg
+    publisher: monk.io
+    description: |
+      Grafana is an open-source data visualization and analytics platform that allows users to create, explore, and share dashboards and graphs from a wide range of data sources. It is a popular tool for monitoring and analyzing metrics, logs, and other time-series data from various sources, including databases, cloud services, and IoT devices.
+
+      Grafana provides a user-friendly interface that allows users to create and customize visualizations using a wide range of options and plugins. It offers support for multiple data sources, including Prometheus, Graphite, Elasticsearch, InfluxDB, and many others.
+
+      Grafana allows users to create custom dashboards that display real-time data and provide insights into the health and performance of their systems. It offers a variety of visualization options, including graphs, tables, heatmaps, and alerts, and allows users to create custom alerts that trigger notifications based on predefined conditions.
+
+      Grafana is highly scalable and can be deployed in a variety of environments, including on-premise, cloud, and hybrid environments. It offers integrations with other popular tools such as Prometheus, Kubernetes, and Docker, making it a versatile and powerful tool for monitoring and analyzing complex distributed systems. Overall, Grafana is an essential tool for any organization looking to monitor and analyze their data effectively.
+    source: https://github.com/grafana/grafana
+    tags: monitoring, exporter, prometheus, grafana
+
+  services:
+    grafana:
+      container: grafana
+      port: 3000
+      protocol: tcp
+      host-port: 3000
+
+  connections:
+    prometheus:
+      runnable: monitoring/prometheus
+      service: prometheus
 
   containers:
     grafana:
@@ -64,7 +141,7 @@ grafana:
       - <- `GF_INSTALL_PLUGINS=${install_plugins}`
       image: docker.io/grafana/grafana
       ports:
-      - 3000:3000
+        - 3000:3000
       image-tag: latest
 
   files:
@@ -73,13 +150,13 @@ grafana:
       mode: 0644
       path: /etc/grafana/provisioning/datasources/datasources.yaml
       contents: <<< files/datasources.yaml
-    
+
     dashboard:
       container: grafana
       mode: 0644
       path: /etc/grafana/provisioning/dashboards/dashboards.yaml
       contents: <<< files/dashboards.yaml
-    
+
     dashboard_diskfree:
       container: grafana
       mode: 0644
@@ -95,13 +172,13 @@ grafana:
   variables:
     prometheusHost:
       type: string
-      value: <- get-hostname("monitoring/prometheus", "prom")
+      value: <- connection-hostname("prometheus")
     admin-user:
       value: admin
       type: string
     admin-password:
       type: string
-      value: adminz
+      value: admin
     install_plugins:
       type: string
       value: grafana-clock-panel,grafana-simple-json-datasource
@@ -118,3 +195,16 @@ stack:
     - monitoring/grafana
     - monitoring/node-exporter
     - monitoring/prometheus
+
+  metadata:
+    website:
+    name: Node Exporter + Grafana + Prometheus
+    icon:
+    publisher: monk.io
+    description: |
+      Together, Prometheus, Node Exporter, and Grafana form a powerful toolchain for monitoring and analyzing the health and performance of distributed systems.
+      Node Exporter collects system-level metrics from a host and exports them to Prometheus, which stores the data in a time-series database. Grafana then provides a user-friendly interface for creating and customizing visualizations and dashboards based on the data stored in Prometheus.
+
+      This toolchain allows users to monitor and analyze the performance of their systems effectively, identify issues, and make informed decisions to improve the health and performance of their systems.
+    source:
+    tags: monitoring, exporter, prometheus, grafana
