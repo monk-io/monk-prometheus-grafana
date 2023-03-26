@@ -199,7 +199,7 @@ stack:
   metadata:
     website:
     name: Node Exporter + Grafana + Prometheus
-    icon:
+    icon: https://prometheus.io/assets/prometheus_logo_grey.svg
     publisher: monk.io
     description: |
       Together, Prometheus, Node Exporter, and Grafana form a powerful toolchain for monitoring and analyzing the health and performance of distributed systems.
