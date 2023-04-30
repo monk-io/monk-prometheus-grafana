@@ -22,7 +22,6 @@ node-exporter:
       container: node
       port: 9100
       protocol: tcp
-      # host-port: 9100
 
   containers:
     node:
@@ -31,8 +30,6 @@ node-exporter:
       paths:
         - '/:/host:ro,rslave'
       bash: <- `/bin/node_exporter ${cmdParams}`
-      # ports:
-      #   - 9100:9100
 
   variables:
     cmdParams:
@@ -63,7 +60,6 @@ prometheus:
       container: prom
       port: 9090
       protocol: tcp
-      # host-port: 9090
 
   connections:
     node:
@@ -74,8 +70,6 @@ prometheus:
     prom:
       image: prom/prometheus
       image-tag: latest
-      # ports:
-      #   - 9090:9090
       bash: <- `/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/console ${cmdParams}`
 
   variables:
@@ -140,8 +134,6 @@ grafana:
       - <- `GF_SECURITY_ADMIN_PASSWORD=${admin-password}`
       - <- `GF_INSTALL_PLUGINS=${install_plugins}`
       image: docker.io/grafana/grafana
-      ports:
-        - 3000:3000
       image-tag: latest
 
   files:
