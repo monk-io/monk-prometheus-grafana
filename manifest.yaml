@@ -14,6 +14,17 @@ node-exporter:
       Node Exporter collects a wide range of metrics related to system resources and provides them in a standardized format, allowing users to easily monitor and analyze the performance of their hosts. It supports a variety of operating systems and architectures, making it compatible with a wide range of systems.
 
       Node Exporter can be configured to collect and export additional custom metrics, and it provides various plugins and integrations with other monitoring and alerting tools. It also has a simple and easy-to-use interface, making it accessible to users of all skill levels. Overall, Node Exporter is a powerful and versatile tool that plays a critical role in monitoring the health and performance of hosts in a distributed system.
+
+      ---
+
+      Notes:
+
+      Variables:
+
+      | Variable  | Description                  | Default             |
+      | --------- | -----------------------------| ------------------- |
+      | cmdParams | Default node exporter params | --path.rootfs=/host |
+
     source: https://github.com/prometheus/node_exporter
     tags: node exporter, monitoring, exporter, prometheus
 
@@ -52,6 +63,17 @@ prometheus:
       Prometheus provides various features that help users monitor and analyze the performance of their systems, including visualization tools, alerting rules, and integrations with other monitoring and alerting tools. It also supports horizontal scaling and can be deployed in a highly available configuration.
 
       Prometheus is highly configurable and customizable, making it suitable for a wide range of use cases. Its ease of use and flexibility have made it a popular choice among developers and DevOps teams looking to monitor and manage their systems effectively.
+
+      ---
+
+      Notes:
+
+      Variables:
+
+      | Variable           | Description                                     | Default |
+      | ------------------ | ----------------------------------------------- | ------- |
+      | cmdParams          | Additional params to pass to Prometheus cmdline |         |
+      | additional_targets | Additional scrape targets for Prometheus*       |         |
     source: https://github.com/prometheus/node_exporter
     tags: monitoring, exporter, prometheus
 
@@ -108,6 +130,21 @@ grafana:
       Grafana allows users to create custom dashboards that display real-time data and provide insights into the health and performance of their systems. It offers a variety of visualization options, including graphs, tables, heatmaps, and alerts, and allows users to create custom alerts that trigger notifications based on predefined conditions.
 
       Grafana is highly scalable and can be deployed in a variety of environments, including on-premise, cloud, and hybrid environments. It offers integrations with other popular tools such as Prometheus, Kubernetes, and Docker, making it a versatile and powerful tool for monitoring and analyzing complex distributed systems. Overall, Grafana is an essential tool for any organization looking to monitor and analyze their data effectively.
+
+      ---
+
+      Notes:
+
+      Variables:
+
+      | Variable        | Description                               | Default                                            |
+      | --------------- | ----------------------------------------- | -------------------------------------------------- |
+      | admin-user      | Administrator username                    | admin                                              |
+      | admin-password  | Administrator password                    | admin                                              |
+      | install_plugins | Default plugins to install with grafana   | grafana-clock-panel,grafana-simple-json-datasource |
+      | anonymous       | Should we enable anonymous access         | false                                              |
+      | anonymous_role  | Role of the anonymous user                | Viewer                                             |
+
     source: https://github.com/grafana/grafana
     tags: monitoring, exporter, prometheus, grafana
 
