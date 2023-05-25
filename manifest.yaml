@@ -26,7 +26,7 @@ node-exporter:
       | cmdParams | Default node exporter params | --path.rootfs=/host |
 
     source: https://github.com/prometheus/node_exporter
-    tags: node exporter, monitoring, exporter, prometheus
+    tags: prometheus, node exporter, monitoring
 
   services:
     exporter:
@@ -75,7 +75,7 @@ prometheus:
       | cmdParams          | Additional params to pass to Prometheus cmdline |         |
       | additional_targets | Additional scrape targets for Prometheus*       |         |
     source: https://github.com/prometheus/node_exporter
-    tags: monitoring, exporter, prometheus
+    tags: prometheus, monitoring, exporter
 
   services:
     prometheus:
@@ -146,7 +146,7 @@ grafana:
       | anonymous_role  | Role of the anonymous user                | Viewer                                             |
 
     source: https://github.com/grafana/grafana
-    tags: monitoring, exporter, prometheus, grafana
+    tags: prometheus, grafana, monitoring, exporter
 
   services:
     grafana:
@@ -236,4 +236,4 @@ stack:
 
       This toolchain allows users to monitor and analyze the performance of their systems effectively, identify issues, and make informed decisions to improve the health and performance of their systems.
     source:
-    tags: monitoring, exporter, prometheus, grafana
+    tags: prometheus, grafana, monitoring, exporter
